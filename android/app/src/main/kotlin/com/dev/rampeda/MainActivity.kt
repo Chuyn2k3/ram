@@ -1,4 +1,4 @@
-package com.dev.ram
+package com.dev.rampeda
 
 import io.flutter.embedding.android.FlutterActivity
 

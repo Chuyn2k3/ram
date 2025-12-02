@@ -97,4 +97,26 @@ class RampedaCubit extends Cubit<RampedaState> {
       }
     }
   }
+
+  Future<void> updateConfig({
+    required int distance,
+    required int redMs,
+    required int greenMs,
+  }) async {
+    if (!isConnected || state.isBusy) return;
+
+    emit(state.copyWith(isBusy: true, message: null));
+    try {
+      await repository.updateConfig(distance, redMs, greenMs);
+      emit(state.copyWith(
+        isBusy: false,
+        message: 'Configuration mise à jour avec succès',
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        isBusy: false,
+        message: 'Erreur mise à jour config: $e',
+      ));
+    }
+  }
 }

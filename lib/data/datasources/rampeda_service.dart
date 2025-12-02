@@ -4,4 +4,9 @@ abstract class RampedaService {
   Future<void> eraseSd();
   Future<void> coupeWifi();
   Future<void> adjustTime(DateTime dateTime);
+  Future<void> updateConfig({
+    required int distance,
+    required int redMs,
+    required int greenMs,
+  });
 }

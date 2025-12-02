@@ -28,4 +28,13 @@ class RampedaRepositoryImpl implements RampedaRepository {
 
   @override
   Future<void> adjustTime(DateTime dateTime) => service.adjustTime(dateTime);
+
+  @override
+  Future<void> updateConfig(int distance, int redMs, int greenMs) {
+    return service.updateConfig(
+      distance: distance,
+      redMs: redMs,
+      greenMs: greenMs,
+    );
+  }
 }

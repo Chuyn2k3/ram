@@ -6,4 +6,5 @@ abstract class RampedaRepository {
   Future<void> eraseSd();
   Future<void> coupeWifi();
   Future<void> adjustTime(DateTime dateTime);
+  Future<void> updateConfig(int distance, int redMs, int greenMs);
 }

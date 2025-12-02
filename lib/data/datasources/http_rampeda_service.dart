@@ -94,4 +94,29 @@ class HttpRampedaService implements RampedaService {
       throw Exception('Erreur adjustTime: ${resp.statusCode}');
     }
   }
+
+  @override
+  Future<void> updateConfig({
+    required int distance,
+    required int redMs,
+    required int greenMs,
+  }) async {
+    // Clamp & validate theo yêu cầu thiết bị
+    final d = distance.clamp(100, 600);
+    final r = redMs.clamp(1000, 60000);
+    final g = greenMs.clamp(1000, 60000);
+
+    // Format: /&&DDDrrrrgggg
+    // DDD: 3 chữ số, rrrr & gggg: 4 chữ số (theo ví dụ 12310002000)
+    final dStr = d.toString().padLeft(3, '0');
+    final rStr = r.toString().padLeft(4, '0');
+    final gStr = g.toString().padLeft(4, '0');
+
+    final payload = '$dStr$rStr$gStr';
+
+    final resp = await _getWithRetry('/&&$payload');
+    if (resp.statusCode != 200) {
+      throw Exception('Erreur update config: ${resp.statusCode}');
+    }
+  }
 }

@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ram/presentation/pages/wifi_connect.dart';
-
-import 'data/datasources/fake_rampeda_service.dart';
 import 'data/datasources/http_rampeda_service.dart';
 import 'data/datasources/rampeda_service.dart';
 import 'data/repositories/rampeda_repository_impl.dart';
@@ -39,7 +36,7 @@ class RampedaApp extends StatelessWidget {
         ),
         home:
             //const WifiConnectionPage(),
-            RampedaPage(),
+            const RampedaPage(),
       ),
     );
   }
