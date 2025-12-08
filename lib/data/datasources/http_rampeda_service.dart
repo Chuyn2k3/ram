@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+import '../../domain/entities/rampeda_config.dart';
 import 'rampeda_service.dart';
 
 class HttpRampedaService implements RampedaService {
@@ -102,9 +103,9 @@ class HttpRampedaService implements RampedaService {
     required int greenMs,
   }) async {
     // Clamp & validate theo yêu cầu thiết bị
-    final d = distance.clamp(100, 600);
-    final r = redMs.clamp(1000, 6000);
-    final g = greenMs.clamp(1000, 6000);
+    final d = distance.clamp(100, 700);
+    final r = redMs.clamp(1000, 7000);
+    final g = greenMs.clamp(1000, 7000);
 
     // Format: /&&DDDrrrrgggg
     // DDD: 3 chữ số, rrrr & gggg: 4 chữ số (theo ví dụ 12310002000)
@@ -118,5 +119,33 @@ class HttpRampedaService implements RampedaService {
     if (resp.statusCode != 200) {
       throw Exception('Erreur update config: ${resp.statusCode}');
     }
+  }
+
+  @override
+  Future<RampedaConfig> getConfig() async {
+    final resp = await _getWithRetry('/param');
+    if (resp.statusCode != 200) {
+      throw Exception('Erreur /param: ${resp.statusCode}');
+    }
+
+    final body = resp.body.trim();
+    // aaabbbbcccc: 3 + 4 + 4 = 11 ký tự
+    if (body.length < 11) {
+      throw Exception('Réponse /param invalide: "$body"');
+    }
+
+    final distanceStr = body.substring(0, 3);
+    final redStr = body.substring(3, 7);
+    final greenStr = body.substring(7, 11);
+
+    final distance = int.tryParse(distanceStr) ?? 0;
+    final redMs = int.tryParse(redStr) ?? 0;
+    final greenMs = int.tryParse(greenStr) ?? 0;
+
+    return RampedaConfig(
+      distance: distance,
+      redMs: redMs,
+      greenMs: greenMs,
+    );
   }
 }

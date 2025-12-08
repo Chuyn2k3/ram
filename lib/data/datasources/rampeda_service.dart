@@ -1,3 +1,5 @@
+import '../../domain/entities/rampeda_config.dart';
+
 abstract class RampedaService {
   Future<bool> ping();
   Future<String> getLogs();
@@ -9,4 +11,5 @@ abstract class RampedaService {
     required int redMs,
     required int greenMs,
   });
+  Future<RampedaConfig> getConfig();
 }

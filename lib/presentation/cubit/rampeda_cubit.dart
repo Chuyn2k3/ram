@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../core/enums/connection_status.dart';
+import '../../domain/entities/rampeda_config.dart';
 import '../../domain/repositories/rampeda_repository.dart';
 import 'rampeda_state.dart';
 
@@ -95,6 +96,32 @@ class RampedaCubit extends Cubit<RampedaState> {
         emit(state.copyWith(connectionStatus: status));
         return;
       }
+    }
+  }
+
+  Future<RampedaConfig> loadConfig() async {
+    try {
+      final cfg = await repository.getConfig();
+
+      if (cfg == null) {
+        // Lỗi → mặc định 0, có message báo lỗi
+        emit(state.copyWith(
+          message:
+              'Erreur de lecture des paramètres (valeurs par défaut 0 appliquées).',
+        ));
+        return RampedaConfig.zero;
+      }
+
+      emit(state.copyWith(
+        message: 'Paramètres chargés avec succès.',
+      ));
+
+      return cfg;
+    } catch (e) {
+      emit(state.copyWith(
+        message: 'Erreur de lecture des paramètres: $e',
+      ));
+      return RampedaConfig.zero;
     }
   }
 

@@ -1962,6 +1962,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../core/enums/connection_status.dart';
+import '../../domain/entities/rampeda_config.dart';
 import '../cubit/rampeda_cubit.dart';
 import '../cubit/rampeda_state.dart';
 import '../enum/rampeda_config_field.dart';
@@ -2176,7 +2177,7 @@ class _RampedaPageState extends State<RampedaPage>
 
         VoidCallback? onTap;
         //!disabled
-        if (!disabled) {
+        if (disabled) {
           switch (feature) {
             case RampedaFeature.dateTime:
               onTap = () => _onUpdateDate(context);
@@ -2381,11 +2382,54 @@ class _RampedaPageState extends State<RampedaPage>
   Future<void> _openConfigSheet(BuildContext context, bool isDark) async {
     final cubit = context.read<RampedaCubit>();
 
-    int distance = 200; // mm
-    int redMs = 5000; // ms
-    int greenMs = 5000; // ms
+    // 0) Hiển thị loading ngay khi bấm CONFIG
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black45,
+      builder: (_) {
+        return Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation(
+              isDark ? Colors.white : const Color(0xFF22C55E),
+            ),
+          ),
+        );
+      },
+    );
 
-    // Màu cho từng nhóm
+    // 1) Gọi API lấy config
+    late final RampedaConfig config;
+    try {
+      config = await cubit.loadConfig();
+    } finally {
+      if (mounted) {
+        // đóng dialog loading
+        Navigator.of(context, rootNavigator: true).pop();
+      }
+    }
+
+    if (!mounted) return;
+
+    // Nếu trả về 0 hết → coi như lỗi, dùng min để Slider không bị crash
+    int distance = config.distance == 0
+        ? RampedaConfigField.distance.min
+        : config.distance;
+    int redMs = config.redMs == 0 ? RampedaConfigField.redMs.min : config.redMs;
+    int greenMs =
+        config.greenMs == 0 ? RampedaConfigField.greenMs.min : config.greenMs;
+
+    // Text hiển thị ở sheet
+    final bool isError =
+        config.distance == 0 && config.redMs == 0 && config.greenMs == 0;
+
+    final String infoText = isError
+        ? 'Erreur de lecture des paramètres. Valeurs minimales affichées.'
+        : 'Paramètres courants lus depuis l’appareil.';
+
+    final Color infoColor =
+        isError ? const Color(0xFFEF4444) : const Color(0xFF22C55E);
+
     final values = <RampedaConfigField, int>{
       RampedaConfigField.distance: distance,
       RampedaConfigField.redMs: redMs,
@@ -2470,7 +2514,44 @@ class _RampedaPageState extends State<RampedaPage>
                       color: isDark ? Colors.white : const Color(0xFF111827),
                     ),
                   ),
+                  const SizedBox(height: 8),
+
+                  // Banner trạng thái đọc config
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: infoColor.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: infoColor.withOpacity(0.4)),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          isError
+                              ? Icons.error_outline
+                              : Icons.check_circle_outline,
+                          size: 18,
+                          color: infoColor,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            infoText,
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              color: isDark
+                                  ? Colors.white70
+                                  : const Color(0xFF111827),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   const SizedBox(height: 16),
+
+                  // Các field config (text disabled, slider chỉnh)
                   for (final field in RampedaConfigField.values) ...[
                     Text(
                       field.label,
@@ -2500,6 +2581,7 @@ class _RampedaPageState extends State<RampedaPage>
                               inputFormatters: [
                                 FilteringTextInputFormatter.digitsOnly,
                               ],
+                              enabled: false, // chỉ show text
                               decoration: InputDecoration(
                                 isDense: true,
                                 border: border(field.color),

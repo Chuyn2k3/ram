@@ -1,4 +1,5 @@
 import '../../core/enums/connection_status.dart';
+import '../../domain/entities/rampeda_config.dart';
 import '../../domain/repositories/rampeda_repository.dart';
 import '../datasources/rampeda_service.dart';
 
@@ -36,5 +37,14 @@ class RampedaRepositoryImpl implements RampedaRepository {
       redMs: redMs,
       greenMs: greenMs,
     );
+  }
+
+  @override
+  Future<RampedaConfig?> getConfig() async {
+    try {
+      return await service.getConfig();
+    } catch (_) {
+      return null;
+    }
   }
 }
