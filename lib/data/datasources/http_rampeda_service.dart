@@ -103,8 +103,8 @@ class HttpRampedaService implements RampedaService {
   }) async {
     // Clamp & validate theo yêu cầu thiết bị
     final d = distance.clamp(100, 600);
-    final r = redMs.clamp(1000, 60000);
-    final g = greenMs.clamp(1000, 60000);
+    final r = redMs.clamp(1000, 6000);
+    final g = greenMs.clamp(1000, 6000);
 
     // Format: /&&DDDrrrrgggg
     // DDD: 3 chữ số, rrrr & gggg: 4 chữ số (theo ví dụ 12310002000)

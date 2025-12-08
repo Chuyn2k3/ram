@@ -34,10 +34,10 @@ extension RampedaConfigFieldX on RampedaConfigField {
   String get hint {
     switch (this) {
       case RampedaConfigField.distance:
-        return '100–600';
+        return '100–700';
       case RampedaConfigField.redMs:
       case RampedaConfigField.greenMs:
-        return '1000–60000';
+        return '1000–7000';
     }
   }
 
@@ -67,10 +67,10 @@ extension RampedaConfigFieldX on RampedaConfigField {
   int get max {
     switch (this) {
       case RampedaConfigField.distance:
-        return 600;
+        return 700;
       case RampedaConfigField.redMs:
       case RampedaConfigField.greenMs:
-        return 60000;
+        return 7000;
     }
   }
 
@@ -78,10 +78,10 @@ extension RampedaConfigFieldX on RampedaConfigField {
   int get step {
     switch (this) {
       case RampedaConfigField.distance:
-        return 1;
+        return 25;
       case RampedaConfigField.redMs:
       case RampedaConfigField.greenMs:
-        return 1000;
+        return 500;
     }
   }
 
