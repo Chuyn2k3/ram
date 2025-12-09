@@ -7,7 +7,9 @@ enum RampedaFeature {
   export,
   readSd,
   restart,
+  // <--- NÚT MỚI
   config,
+  closeApp,
 }
 
 extension RampedaFeatureX on RampedaFeature {
@@ -25,6 +27,8 @@ extension RampedaFeatureX on RampedaFeature {
         return 'Lire SD';
       case RampedaFeature.restart:
         return 'Redémarrer';
+      case RampedaFeature.closeApp:
+        return 'Fermer app'; // <---
       case RampedaFeature.config:
         return 'Config';
     }
@@ -44,6 +48,8 @@ extension RampedaFeatureX on RampedaFeature {
         return Icons.folder_open_rounded;
       case RampedaFeature.restart:
         return Icons.power_settings_new_rounded;
+      case RampedaFeature.closeApp:
+        return Icons.exit_to_app_rounded; // <---
       case RampedaFeature.config:
         return Icons.tune_rounded;
     }
@@ -63,6 +69,8 @@ extension RampedaFeatureX on RampedaFeature {
         return const [Color(0xFF06B6D4), Color(0xFF0891B2)];
       case RampedaFeature.restart:
         return const [Color(0xFFF97316), Color(0xFFEA580C)];
+      case RampedaFeature.closeApp:
+        return const [Color(0xFF111827), Color(0xFF4B5563)]; // <---
       case RampedaFeature.config:
         return const [Color(0xFF22C55E), Color(0xFF16A34A)];
     }

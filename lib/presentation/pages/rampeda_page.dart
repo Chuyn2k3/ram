@@ -2177,7 +2177,7 @@ class _RampedaPageState extends State<RampedaPage>
 
         VoidCallback? onTap;
         //!disabled
-        if (disabled) {
+        if (!disabled) {
           switch (feature) {
             case RampedaFeature.dateTime:
               onTap = () => _onUpdateDate(context);
@@ -2195,6 +2195,11 @@ class _RampedaPageState extends State<RampedaPage>
               onTap = cubit.loadLogs;
               break;
             case RampedaFeature.restart:
+              onTap = () => _onRestart(context);
+              break;
+
+            // NÚT MỚI: gửi /coupeWifi + hỏi có đóng app không
+            case RampedaFeature.closeApp:
               onTap = () => _onFermer(context);
               break;
             case RampedaFeature.config:
@@ -2276,14 +2281,22 @@ class _RampedaPageState extends State<RampedaPage>
     if (ok) await context.read<RampedaCubit>().formatSdAndWaitRestart();
   }
 
-  Future<void> _onFermer(BuildContext context) async {
+  Future<void> _onRestart(BuildContext context) async {
     final ok = await _confirm(
       context,
       'Redémarrer l\'appareil ?',
-      'L\'application va se fermer et l\'appareil va redémarrer.',
+      'L\'appareil va redémarrer. La connexion sera perdue puis rétablie automatiquement.',
       confirmText: 'Redémarrer',
     );
-    if (ok) await context.read<RampedaCubit>().coupeWifiAndWaitRestart();
+    if (ok) {
+      await context.read<RampedaCubit>().coupeWifiAndWaitRestart();
+    }
+  }
+
+  Future<void> _onFermer(BuildContext context) async {
+    await context
+        .read<RampedaCubit>()
+        .coupeWifiAndWaitRestartAndCloseApp(context);
   }
 
   Future<void> _onExportEmail(BuildContext context) async {

@@ -1,5 +1,8 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../core/enums/connection_status.dart';
@@ -70,6 +73,68 @@ class RampedaCubit extends Cubit<RampedaState> {
     }
     await _waitForReconnect();
     emit(state.copyWith(isBusy: false));
+  }
+
+  Future<void> coupeWifiAndWaitRestartAndCloseApp(BuildContext context) async {
+    //if (!isConnected || state.isBusy) return;
+
+    emit(state.copyWith(isBusy: true, message: null));
+
+    bool ok = false;
+    try {
+      await repository.coupeWifi();
+      ok = true;
+
+      emit(state.copyWith(
+        isBusy: false,
+        connectionStatus: ConnectionStatus.disconnected,
+        message: 'Commande envoyée, le Wi-Fi de l’appareil va s’arrêter.',
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        isBusy: false,
+        message: 'Erreur fermeture: $e',
+      ));
+    }
+
+    // Nếu gửi lệnh thất bại thì thôi, không đóng app
+    if (!ok) return;
+
+    // Popup xác nhận đóng app
+    final shouldClose = await showDialog<bool>(
+          context: context,
+          barrierDismissible: false,
+          builder: (dialogContext) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            title: const Text('Fermer l’application ?'),
+            content: const Text(
+              'La commande de redémarrage a été envoyée à l’appareil.\n'
+              'Voulez-vous maintenant fermer l’application RAMPEDA ?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(false),
+                child: const Text('Annuler'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.of(dialogContext).pop(true),
+                child: const Text('Fermer'),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+
+    if (!shouldClose) return;
+
+    // Đóng app theo nền tảng
+    if (Platform.isAndroid) {
+      SystemNavigator.pop();
+    } else if (Platform.isIOS) {
+      exit(0);
+    }
   }
 
   Future<void> adjustTimeAndWaitRestart(DateTime dateTime) async {

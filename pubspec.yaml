@@ -42,8 +42,6 @@ dependencies:
   path_provider: ^2.1.5
   google_fonts: ^6.2.1
   wifi_iot: ^0.3.19+2
-  change_app_package_name:
-  flutter_launcher_icons:
 dev_dependencies:
   flutter_test:
     sdk: flutter
