@@ -2378,6 +2378,7 @@ class _RampedaPageState extends State<RampedaPage>
   }
 
   Future<void> _exportLogsFile(String content) async {
+    await context.read<RampedaCubit>().coupeWifi();
     final dir = await getTemporaryDirectory();
     final file = File(
       '${dir.path}/rampeda_logs_${DateTime.now().millisecondsSinceEpoch}.txt',

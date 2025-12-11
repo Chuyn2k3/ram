@@ -63,6 +63,17 @@ class RampedaCubit extends Cubit<RampedaState> {
     emit(state.copyWith(isBusy: false));
   }
 
+  Future<void> coupeWifi() async {
+    if (!isConnected || state.isBusy) return;
+    emit(state.copyWith(isBusy: true, message: null));
+    try {
+      await repository.coupeWifi();
+    } catch (e) {
+      emit(state.copyWith(message: 'Erreur fermeture: $e'));
+    }
+    emit(state.copyWith(isBusy: false));
+  }
+
   Future<void> coupeWifiAndWaitRestart() async {
     if (!isConnected || state.isBusy) return;
     emit(state.copyWith(isBusy: true, message: null));
